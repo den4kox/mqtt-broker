@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>Document</title>
+</head>
+<body>
+    <h1>Real Time</h1>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.slim.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        const send = () => {
+            const topic = document.querySelector(".topic").value;
+            const message = document.querySelector(".message").value;
+            console.log('PUBLISH!');
+            socket.emit('publish', { topic, message });
+        };
+        
+        var socket = io.connect('http://localhost:5000');
+        socket.on('connect', function () {
+            console.log('CONNECT!!!');
+            socket.on('mqtt', function (msg) {
+            console.log(msg.topic+' '+msg.payload);
+            
+            var node = document.createElement("div");    
+
+            var topic = document.createElement("span");
+            var textTopic = document.createTextNode(msg.topic);
+            topic.appendChild(textTopic); 
+            
+            var message = document.createElement("span");
+            var textMessage = document.createTextNode(msg.payload);
+            message.appendChild(textMessage);      
+            
+            node.appendChild(topic);
+            node.appendChild(message);                             
+            document.querySelector(".messages").appendChild(node);
+
+            });
+            socket.emit('subscribe',{topic:'#'});
+        });
+    </script>
+    <input type="text" class="topic">
+    <input type="text" class="message">
+    <button onClick="send()" >Send</button>
+    <div class="messages">
+
+    </div>
+</body>
+</html>
